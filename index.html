@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能背单词</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 头部样式 */
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* 主页按钮样式 */
+        .home-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .button {
+            background-color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+        }
+
+        .button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border-color: #4CAF50;
+        }
+
+        .button-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .button-text {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* 功能页面样式 */
+        .section {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        h3 {
+            color: #555;
+            margin: 15px 0;
+        }
+
+        /* 学习模块样式 */
+        #word-card {
+            background-color: #f9f9f9;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .word {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .meaning {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #know-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #know-btn:hover {
+            background-color: #45a049;
+        }
+
+        #unknown-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #unknown-btn:hover {
+            background-color: #da190b;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        form button {
+            background-color: #2196F3;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #0b7dda;
+        }
+
+        /* 单词列表样式 */
+        #words-ul,
+        #review-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        #words-ul li,
+        #review-list li {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        #words-ul li:last-child,
+        #review-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* 计划状态样式 */
+        #plan-status {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        #plan-status p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        #progress {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        /* 页脚样式 */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            border-radius: 8px;
+        }
+
+        /* 返回主页按钮 */
+        .back-home {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .back-home:hover {
+            background-color: #45a049;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .home-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .button {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .button:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .button:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .button:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>智能背单词</h1>
+        </header>
+
+        <main>
+            <!-- 主页 -->
+            <div id="home" class="page">
+                <div class="home-buttons">
+                    <button onclick="showPage('study')" class="button">
+                        <div class="button-icon">📚</div>
+                        <div class="button-text">学习新单词</div>
+                    </button>
+                    <button onclick="showPage('upload')" class="button">
+                        <div class="button-icon">📤</div>
+                        <div class="button-text">上传单词</div>
+                    </button>
+                    <button onclick="showPage('plan')" class="button">
+                        <div class="button-icon">📅</div>
+                        <div class="button-text">个人计划</div>
+                    </button>
+                    <button onclick="showPage('review')" class="button">
+                        <div class="button-icon">🔄</div>
+                        <div class="button-text">复习</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 学习页面 -->
+            <div id="study" class="page" style="display: none;">
+                <button onclick="showPage('home')" class="back-home">🏠 返回主页</button>
+                <section class="section">
+                    <h2>学习新单词</h2>
+                    <div id="study-container">
+                        <div id="word-card">
+                            <div class="word">--</div>
+                            <div class="meaning">--</div>
+                        </div>
+                        <div class="buttons">
+                            <button id="know-btn">认识</button>
+                            <button id="unknown-btn">不认识</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 上传单词页面 -->
+            <div id="upload" class="page" style="display: none;">
+                <button onclick="showPage('home')" class="back-home">🏠 返回主页</button>
+                <section class="section">
+                    <h2>上传单词</h2>
+                    <form id="upload-form">
+                        <div class="form-group">
+                            <label for="word">单词</label>
+                            <input type="text" id="word" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="meaning">释义</label>
+                            <textarea id="meaning" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="example">例句（可选）</label>
+                            <textarea id="example"></textarea>
+                        </div>
+                        <button type="submit">添加单词</button>
+                    </form>
+                    <div id="word-list">
+                        <h3>单词列表</h3>
+                        <ul id="words-ul"></ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 个人计划页面 -->
+            <div id="plan" class="page" style="display: none;">
+                <button onclick="showPage('home')" class="back-home">🏠 返回主页</button>
+                <section class="section">
+                    <h2>个人计划</h2>
+                    <form id="plan-form">
+                        <div class="form-group">
+                            <label for="daily-goal">每日目标（单词数）</label>
+                            <input type="number" id="daily-goal" min="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="study-time">每日学习时间（分钟）</label>
+                            <input type="number" id="study-time" min="1" value="30">
+                        </div>
+                        <button type="submit">保存计划</button>
+                    </form>
+                    <div id="plan-status">
+                        <h3>计划状态</h3>
+                        <p>今日已学习：<span id="today-studied">0</span> 个单词</p>
+                        <p>今日目标：<span id="today-goal">10</span> 个单词</p>
+                        <p>学习进度：<span id="progress">0</span>%</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 复习页面 -->
+            <div id="review" class="page" style="display: none;">
+                <button onclick="showPage('home')" class="back-home">🏠 返回主页</button>
+                <section class="section">
+                    <h2>复习</h2>
+                    <div id="review-container">
+                        <h3>待复习单词</h3>
+                        <ul id="review-list"></ul>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <p>智能背单词软件 &copy; 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // 页面切换功能
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            // 显示选中页面
+            document.getElementById(pageId).style.display = 'block';
+            
+            // 初始化对应页面的功能
+            if (pageId === 'study') {
+                initStudy();
+            } else if (pageId === 'upload') {
+                renderWordList();
+            } else if (pageId === 'plan') {
+                updatePlanStatus();
+            } else if (pageId === 'review') {
+                renderReviewList();
+            }
+        }
+
+        // 数据存储相关
+        const STORAGE_KEYS = {
+            WORDS: 'vocabulary_words',
+            PLAN: 'vocabulary_plan',
+            STUDY_RECORD: 'vocabulary_study_record',
+            REVIEW_SCHEDULE: 'vocabulary_review_schedule'
+        };
+
+        // 遗忘曲线复习间隔（天）
+        const FORGETTING_CURVE_INTERVALS = [1, 2, 4, 7, 15, 30];
+
+        // 初始化数据
+        function initData() {
+            // 初始化单词列表
+            if (!localStorage.getItem(STORAGE_KEYS.WORDS)) {
+                const defaultWords = [
+                    { id: 1, word: 'apple', meaning: '苹果', example: 'I like to eat apples.' },
+                    { id: 2, word: 'banana', meaning: '香蕉', example: 'Bananas are yellow.' },
+                    { id: 3, word: 'cat', meaning: '猫', example: 'The cat is cute.' },
+                    { id: 4, word: 'dog', meaning: '狗', example: 'The dog is loyal.' },
+                    { id: 5, word: 'book', meaning: '书', example: 'I love reading books.' }
+                ];
+                localStorage.setItem(STORAGE_KEYS.WORDS, JSON.stringify(defaultWords));
+            }
+
+            // 初始化个人计划
+            if (!localStorage.getItem(STORAGE_KEYS.PLAN)) {
+                const defaultPlan = {
+                    dailyGoal: 10,
+                    studyTime: 30
+                };
+                localStorage.setItem(STORAGE_KEYS.PLAN, JSON.stringify(defaultPlan));
+            }
+
+            // 初始化学习记录
+            if (!localStorage.getItem(STORAGE_KEYS.STUDY_RECORD)) {
+                const defaultRecord = {
+                    today: new Date().toDateString(),
+                    studied: 0
+                };
+                localStorage.setItem(STORAGE_KEYS.STUDY_RECORD, JSON.stringify(defaultRecord));
+            }
+
+            // 初始化复习计划
+            if (!localStorage.getItem(STORAGE_KEYS.REVIEW_SCHEDULE)) {
+                localStorage.setItem(STORAGE_KEYS.REVIEW_SCHEDULE, JSON.stringify({}));
+            }
+        }
+
+        // 获取数据
+        function getData(key) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        }
+
+        // 保存数据
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        // 单词管理
+        function addWord(word, meaning, example = '') {
+            const words = getData(STORAGE_KEYS.WORDS) || [];
+            const newWord = {
+                id: Date.now(),
+                word,
+                meaning,
+                example
+            };
+            words.push(newWord);
+            saveData(STORAGE_KEYS.WORDS, words);
+            return newWord;
+        }
+
+        function getWords() {
+            return getData(STORAGE_KEYS.WORDS) || [];
+        }
+
+        // 学习功能
+        let currentWordIndex = 0;
+        let wordsToStudy = [];
+
+        function initStudy() {
+            initData();
+            const words = getWords();
+            // 打乱单词顺序
+            wordsToStudy = [...words].sort(() => Math.random() - 0.5);
+            currentWordIndex = 0;
+            showNextWord();
+            
+            // 添加学习按钮事件监听器
+            document.getElementById('know-btn').addEventListener('click', () => {
+                handleWordResponse(true);
+            });
+            
+            document.getElementById('unknown-btn').addEventListener('click', () => {
+                handleWordResponse(false);
+            });
+        }
+
+        function showNextWord() {
+            if (currentWordIndex < wordsToStudy.length) {
+                const word = wordsToStudy[currentWordIndex];
+                document.querySelector('.word').textContent = word.word;
+                document.querySelector('.meaning').textContent = word.meaning;
+            } else {
+                document.querySelector('.word').textContent = '学习完成！';
+                document.querySelector('.meaning').textContent = '所有单词已学习完毕';
+            }
+        }
+
+        function handleWordResponse(known) {
+            if (currentWordIndex < wordsToStudy.length) {
+                const word = wordsToStudy[currentWordIndex];
+                updateStudyRecord();
+                scheduleReview(word, known ? 0 : -1);
+                currentWordIndex++;
+                showNextWord();
+            }
+        }
+
+        function updateStudyRecord() {
+            const record = getData(STORAGE_KEYS.STUDY_RECORD);
+            const today = new Date().toDateString();
+            
+            if (record.today !== today) {
+                record.today = today;
+                record.studied = 1;
+            } else {
+                record.studied++;
+            }
+            
+            saveData(STORAGE_KEYS.STUDY_RECORD, record);
+        }
+
+        // 复习计划
+        function scheduleReview(word, level = 0) {
+            const schedule = getData(STORAGE_KEYS.REVIEW_SCHEDULE);
+            const nextReviewDate = new Date();
+            
+            // 确保level在有效范围内
+            level = Math.max(0, Math.min(level, FORGETTING_CURVE_INTERVALS.length - 1));
+            
+            // 计算下一次复习时间
+            nextReviewDate.setDate(nextReviewDate.getDate() + FORGETTING_CURVE_INTERVALS[level]);
+            
+            if (!schedule[word.id]) {
+                schedule[word.id] = [];
+            }
+            
+            schedule[word.id].push({
+                date: nextReviewDate.toDateString(),
+                level
+            });
+            
+            saveData(STORAGE_KEYS.REVIEW_SCHEDULE, schedule);
+        }
+
+        function getWordsToReview() {
+            const words = getWords();
+            const schedule = getData(STORAGE_KEYS.REVIEW_SCHEDULE);
+            const today = new Date().toDateString();
+            const wordsToReview = [];
+            
+            words.forEach(word => {
+                if (schedule[word.id]) {
+                    const reviewDates = schedule[word.id];
+                    const todayReviews = reviewDates.filter(item => item.date === today);
+                    if (todayReviews.length > 0) {
+                        wordsToReview.push(word);
+                    }
+                }
+            });
+            
+            return wordsToReview;
+        }
+
+        // 个人计划
+        function savePlan(dailyGoal, studyTime) {
+            const plan = {
+                dailyGoal,
+                studyTime
+            };
+            saveData(STORAGE_KEYS.PLAN, plan);
+            updatePlanStatus();
+        }
+
+        function updatePlanStatus() {
+            initData();
+            const plan = getData(STORAGE_KEYS.PLAN);
+            const record = getData(STORAGE_KEYS.STUDY_RECORD);
+            const today = new Date().toDateString();
+            
+            // 检查是否需要重置今日学习记录
+            if (record.today !== today) {
+                record.today = today;
+                record.studied = 0;
+                saveData(STORAGE_KEYS.STUDY_RECORD, record);
+            }
+            
+            document.getElementById('today-studied').textContent = record.studied;
+            document.getElementById('today-goal').textContent = plan.dailyGoal;
+            
+            const progress = Math.min(Math.round((record.studied / plan.dailyGoal) * 100), 100);
+            document.getElementById('progress').textContent = progress;
+            
+            // 添加计划表单事件监听器
+            document.getElementById('plan-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const dailyGoal = parseInt(document.getElementById('daily-goal').value);
+                const studyTime = parseInt(document.getElementById('study-time').value);
+                
+                if (dailyGoal && studyTime) {
+                    savePlan(dailyGoal, studyTime);
+                }
+            });
+        }
+
+        // 渲染单词列表
+        function renderWordList() {
+            initData();
+            const words = getWords();
+            const wordsUl = document.getElementById('words-ul');
+            wordsUl.innerHTML = '';
+            
+            words.forEach(word => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>${word.word}</strong>: ${word.meaning}
+                    ${word.example ? `<br><em>${word.example}</em>` : ''}
+                `;
+                wordsUl.appendChild(li);
+            });
+            
+            // 添加上传表单事件监听器
+            document.getElementById('upload-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const word = document.getElementById('word').value.trim();
+                const meaning = document.getElementById('meaning').value.trim();
+                const example = document.getElementById('example').value.trim();
+                
+                if (word && meaning) {
+                    addWord(word, meaning, example);
+                    renderWordList();
+                    this.reset();
+                }
+            });
+        }
+
+        // 渲染复习列表
+        function renderReviewList() {
+            initData();
+            const wordsToReview = getWordsToReview();
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
+            
+            if (wordsToReview.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = '今日无待复习单词';
+                reviewList.appendChild(li);
+            } else {
+                wordsToReview.forEach(word => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>${word.word}</strong>: ${word.meaning}
+                        ${word.example ? `<br><em>${word.example}</em>` : ''}
+                    `;
+                    reviewList.appendChild(li);
+                });
+            }
+        }
+
+        // 初始化应用
+        initData();
+    </script>
+</body>
+</html>
