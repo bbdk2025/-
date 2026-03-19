@@ -357,6 +357,10 @@
                         <div class="button-icon">🔄</div>
                         <div class="button-text">复习</div>
                     </button>
+                    <button onclick="clearData()" class="button" style="grid-column: 1 / -1; background-color: #ff9800; border-color: #ff9800;">
+                        <div class="button-icon">🗑️</div>
+                        <div class="button-text">重置数据</div>
+                    </button>
                 </div>
             </div>
 
@@ -892,6 +896,20 @@
                     `;
                     reviewList.appendChild(li);
                 });
+            }
+        }
+
+        // 清除数据
+        function clearData() {
+            if (confirm('确定要重置所有数据吗？这将清除所有已保存的单词和学习记录。')) {
+                localStorage.removeItem(STORAGE_KEYS.WORDS);
+                localStorage.removeItem(STORAGE_KEYS.PLAN);
+                localStorage.removeItem(STORAGE_KEYS.STUDY_RECORD);
+                localStorage.removeItem(STORAGE_KEYS.REVIEW_SCHEDULE);
+                initData();
+                alert('数据已重置，新的单词库已加载！');
+                // 重新显示主页
+                showPage('home');
             }
         }
 
